@@ -1,0 +1,65 @@
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+
+	var accountBalance = 1000.0
+
+	fmt.Println("Welcome to the Bank!")
+
+	for {
+
+		fmt.Println("----------------------")
+		fmt.Println("What would you like to do?")
+		fmt.Print("1. Check Balance\n2. Deposit Money\n3. Withdraw Money\n4. Exit\n")
+
+		var choice int
+		fmt.Print("Your Choice: ")
+		fmt.Scan(&choice)
+
+		fmt.Printf("%d Choosen\n", choice)
+		if choice == 1 {
+			fmt.Println("Balance:", accountBalance)
+		} else if choice == 2 {
+			fmt.Print("Enter Amount to Deposit: ")
+			var val float64
+			fmt.Scan(&val)
+
+			if val <= 0 {
+				fmt.Println("Amount must be more than 0")
+				continue
+			}
+
+			accountBalance += val
+			fmt.Println("New Balance: ", accountBalance)
+		} else if choice == 3 {
+			fmt.Print("Enter Amount to withdraw: ")
+			var val float64
+			fmt.Scan(&val)
+
+			if val <= 0 {
+				fmt.Println("Amount must be more than 0")
+				continue
+			}
+
+			if val > accountBalance {
+				fmt.Println("InSufficient  funds")
+				continue
+			}
+
+			accountBalance -= val
+			fmt.Println("New Balance: ", accountBalance)
+		} else if choice == 4 {
+			fmt.Println("See you Again!")
+			break
+		} else {
+			fmt.Println("Invalid Entry, Try Again")
+		}
+
+	}
+
+	fmt.Println("Good-Bye!")
+}
