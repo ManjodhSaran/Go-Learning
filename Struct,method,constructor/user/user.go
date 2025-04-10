@@ -7,43 +7,68 @@ import (
 )
 
 // struct
-type user struct {
+type User struct {
 	name      string
-	age       int
+	age       string
 	dob       string
 	createdAt time.Time
 }
 
 // method
-func (u *user) output() {
+func (u *User) Output() {
 	fmt.Println("Name: ", u.name)
 	fmt.Println("Age: ", u.age)
 	fmt.Println("DOB: ", u.dob)
 	fmt.Println("CreatedAt: ", u.createdAt)
 }
 
-func (u *user) changeName(name string) {
+func (u *User) ChangeName(name string) {
 	u.name = name
 }
 
-func User(name string, age int, dob string) (*user, error) {
-	if age <= 0 {
-		return nil, errors.New("Age must be greater than zero")
+type Admin struct {
+	email    string
+	password string
+	user     User
+}
+
+func NewAdmin(email, password string) Admin {
+	return Admin{
+		email:    email,
+		password: password,
+		user: User{
+			name: "admin",
+			age:  "20",
+			dob:  "2020-01-01",
+		},
+	}
+}
+
+func (a Admin) OutputAdmin() {
+	fmt.Println("Email: ", a.email)
+	fmt.Println("Password: ", a.password)
+	a.user.Output()
+}
+
+func New(name, age, dob string) (*User, error) {
+	if age == "" {
+		return nil, errors.New("age must be greater than zero")
 	}
 	if dob == "" {
-		return nil, errors.New("DOB is required")
+		return nil, errors.New("dob is required")
 	}
 	if name == "" {
-		return nil, errors.New("Name is required")
+		return nil, errors.New("name is required")
 	}
-	u := &user{
+
+	u := &User{
 		name:      name,
 		age:       age,
 		dob:       dob,
 		createdAt: time.Now(),
 	}
 
-	u.output()
+	u.Output()
 
 	return u, nil
 }
