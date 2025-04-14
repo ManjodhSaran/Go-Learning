@@ -11,5 +11,13 @@
     "**/.project": true,
     "**/.settings": true
   },
-  "hide-files.files": []
+  "hide-files.files": [],
+  "github.copilot.enable": {
+    "*": false,
+    "plaintext": true,
+    "markdown": false,
+    "scminput": false,
+    "yaml": false,
+    "python": true
+  }
 }
