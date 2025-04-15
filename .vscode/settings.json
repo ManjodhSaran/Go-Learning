@@ -18,6 +18,7 @@
     "markdown": false,
     "scminput": false,
     "yaml": false,
-    "python": true
+    "python": true,
+    "go": false
   }
 }
