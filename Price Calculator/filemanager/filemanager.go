@@ -45,15 +45,15 @@ func (fm FileManager) WriteResult(data any) error {
 		return errors.New("failed to create file")
 	}
 
+	defer file.Close()
+
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(data)
 	time.Sleep(3 * time.Second)
 	if err != nil {
-		file.Close()
 		return errors.New("failed to create file")
 	}
 
-	file.Close()
 	return nil
 }
 
