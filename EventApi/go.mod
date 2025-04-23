@@ -1,4 +1,4 @@
-module pricecalculator.com
+module eventapi.com
 
 go 1.24.2
 
