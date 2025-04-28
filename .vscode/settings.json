@@ -19,6 +19,6 @@
     "scminput": false,
     "yaml": false,
     "python": true,
-    "go": true
+    "go": false
   }
 }
