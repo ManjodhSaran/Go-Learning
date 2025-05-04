@@ -1,6 +1,9 @@
 package models
 
-import "eventapi.com/db"
+import (
+	"eventapi.com/db"
+	"eventapi.com/utils"
+)
 
 type User struct {
 	ID       int64
@@ -18,7 +21,9 @@ func (user User) Save() error {
 
 	defer stmt.Close()
 
-	result, err := stmt.Exec(user.Email, user.Password)
+	hash := utils.HashPassword(user.Password)
+
+	result, err := stmt.Exec(user.Email, hash)
 
 	if err != nil {
 		return err

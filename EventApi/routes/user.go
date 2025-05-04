@@ -19,9 +19,14 @@ func signup(context *gin.Context) {
 	err = user.Save()
 
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not save event"})
+		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
-	context.JSON(http.StatusCreated, gin.H{"message": "user created", "data": user})
+	newUser := models.User{
+		Email: user.Email,
+		ID:    user.ID,
+	}
+
+	context.JSON(http.StatusCreated, gin.H{"message": "user created", "data": newUser})
 }
