@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+
 	"eventapi.com/db"
 	"eventapi.com/utils"
 )
@@ -32,4 +34,26 @@ func (user User) Save() error {
 
 	user.ID = userID
 	return err
+}
+
+func (user User) Validate() (*string, error) {
+	query := `SELECT id,password FROM users WHERE email = ?`
+	row := db.DB.QueryRow(query, user.Email)
+
+	var password string
+	var userID int64
+
+	err := row.Scan(&userID, &password)
+
+	if err != nil {
+		return nil, errors.New("User not found")
+	}
+
+	if !utils.ComparePassword(user.Password, password) {
+		return nil, errors.New("invalid password")
+	}
+
+	token := utils.GenerateToken(user.ID, user.Email)
+	return &token, nil
+
 }
