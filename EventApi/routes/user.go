@@ -12,7 +12,7 @@ func login(context *gin.Context) {
 	var user models.User
 
 	err := context.ShouldBindJSON(&user)
-	fmt.Print(user)
+
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse data"})
 		return
@@ -24,7 +24,11 @@ func login(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"message": "user logged in", "data": token})
+	context.JSON(http.StatusOK, gin.H{"message": "user logged in", "data": gin.H{
+		"id":    user.ID,
+		"email": user.Email,
+		"token": token,
+	}})
 }
 
 func signup(context *gin.Context) {
@@ -37,16 +41,31 @@ func signup(context *gin.Context) {
 	}
 
 	err = user.Save()
-
+	fmt.Print(user)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
-	newUser := models.User{
-		Email: user.Email,
-		ID:    user.ID,
+	context.JSON(http.StatusCreated, gin.H{
+		"message": "user created",
+		"data": gin.H{
+			"Email": user.Email,
+			"ID":    user.ID,
+		},
+	})
+}
+
+func getUsers(context *gin.Context) {
+	var users []models.UserData
+	err := models.GetAllUsers(&users)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
 	}
 
-	context.JSON(http.StatusCreated, gin.H{"message": "user created", "data": newUser})
+	context.JSON(http.StatusOK, gin.H{
+		"message": "users fetched",
+		"data":    users,
+	})
 }

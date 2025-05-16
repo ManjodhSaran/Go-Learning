@@ -1,12 +1,10 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"eventapi.com/models"
-	"eventapi.com/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -49,31 +47,17 @@ func getEvents(context *gin.Context) {
 
 func createEvents(context *gin.Context) {
 
-	token := context.Request.Header.Get("Authorization")
-
-	if token == "" {
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
-		return
-	}
-
-	userID, email, err := utils.VerifyToken(token)
-
-	if err != nil {
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
-		return
-	}
-
-	fmt.Print(userID, email)
+	userID := context.GetInt64("user_id")
 
 	var event models.Event
-	err = context.ShouldBindJSON(&event)
+	err := context.ShouldBindJSON(&event)
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse data"})
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse data", "error": err.Error()})
+		return
 	}
 
-	event.ID = 1
-	event.UserId = 1
+	event.UserId = userID
 
 	err = event.Save()
 
@@ -92,15 +76,21 @@ func deleteEvent(context *gin.Context) {
 		return
 	}
 
+	userID := context.GetInt64("user_id")
+
 	event, err := models.GetEvent(eventId)
-	print("event", event)
+
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch event"})
 		return
 	}
 
+	if userID != event.UserId {
+		context.JSON(http.StatusForbidden, gin.H{"message": "You are not authorized to delete this event"})
+		return
+	}
+
 	err = event.Delete()
-	print(err)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not delete event"})
@@ -117,10 +107,15 @@ func updateEvent(context *gin.Context) {
 		return
 	}
 
-	_, err = models.GetEvent(eventId)
+	event, err := models.GetEvent(eventId)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch event"})
+		return
+	}
+	userID := context.GetInt64("user_id")
+	if userID != event.UserId {
+		context.JSON(http.StatusForbidden, gin.H{"message": "You are not authorized to update this event"})
 		return
 	}
 
@@ -130,6 +125,7 @@ func updateEvent(context *gin.Context) {
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse data"})
+		return
 	}
 
 	updatedEvent.ID = eventId

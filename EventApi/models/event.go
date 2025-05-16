@@ -7,15 +7,15 @@ import (
 )
 
 type Event struct {
-	ID          int64
-	Name        string    `binding:"required"`
-	Description string    `binding:"required"`
-	Location    string    `binding:"required"`
-	DateTime    time.Time `binding:"required"`
-	UserId      int
+	ID          int64     `json:"id"`
+	Name        string    `binding:"required" json:"name"`
+	Description string    `binding:"required" json:"description"`
+	Location    string    `binding:"required" json:"location"`
+	DateTime    time.Time `json:"date_time"`
+	UserId      int64     `json:"user_id"`
 }
 
-func (e Event) Save() error {
+func (e *Event) Save() error {
 	q := `INSERT INTO events(name,description,location,dateTime,user_id)
 	VALUES (?,?,?,?,?)`
 
@@ -27,7 +27,9 @@ func (e Event) Save() error {
 
 	defer stmt.Close()
 
-	result, err := stmt.Exec(e.Name, e.Description, e.Location, e.DateTime, e.UserId)
+	DateTime := time.Now()
+
+	result, err := stmt.Exec(e.Name, e.Description, e.Location, DateTime, e.UserId)
 
 	if err != nil {
 		return err

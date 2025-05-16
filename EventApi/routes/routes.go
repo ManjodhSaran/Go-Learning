@@ -1,15 +1,48 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"eventapi.com/middlewares"
+	"github.com/gin-gonic/gin"
+)
 
 func RegisteredRoutes(server *gin.Engine) {
-	server.GET("/events", getEvents)
-	server.GET("/events/:id", getEvent)
-	server.POST("/events", createEvents)
-	server.PUT("/events/:id", updateEvent)
-	server.DELETE("/events/:id", deleteEvent)
 
-	server.POST("/signup", signup)
-	server.POST("/login", login)
+	api_v1 := server.Group("/api/v1")
+	{
 
+		// Authentication routes
+		auth := api_v1.Group("/auth")
+		{
+			auth.POST("/signup", signup)
+			auth.POST("/login", login)
+		}
+
+		// Public routes
+		authenticated := api_v1.Group("/")
+		authenticated.Use(middlewares.Auth)
+
+		// Events routes
+		events := authenticated.Group("/events")
+		{
+			events.GET("/", getEvents)
+			events.GET("/:id", getEvent)
+			events.POST("/", createEvents)
+			events.PUT("/:id", updateEvent)
+			events.DELETE("/:id", deleteEvent)
+		}
+
+		// Registering for events routes
+		registerEvents := authenticated.Group("/events/:id/register")
+		{
+			registerEvents.GET("/", eventRegistration)
+			registerEvents.POST("/", registerForEvent)
+			registerEvents.DELETE("/", unregisterFromEvent)
+		}
+
+		// Users routes
+		users := authenticated.Group("/users")
+		{
+			users.GET("/", getUsers)
+		}
+	}
 }
